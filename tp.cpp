@@ -92,8 +92,10 @@ void init() {
 
 #include "parametric_curves/casteljau.h"
 
-std::vector<Vec3> curveControlPoints;
-std::vector<Vec3> curvePoints;
+std::vector<Vec3> curveControlPoints1;
+std::vector<Vec3> curveControlPoints2;
+std::vector<Vec3> curvePoints1;
+std::vector<Vec3> curvePoints2;
 std::vector<Vec3> linePoints;
 
 unsigned int nbU = 100;
@@ -103,17 +105,22 @@ std::vector< std::vector<Vec3> > isoCurves;
 
 
 void setupCurveControlPoints() {
-    curveControlPoints = {
+    curveControlPoints1 = {
             Vec3(-.75, .5, 0),
-            Vec3(-.25, 1.5, 1.5),
-            Vec3(0, -.5, -.25),
-            Vec3(.25, 1.5, -1),
+            Vec3(0, -.5, 1),
             Vec3(.75, .5, 0)
+    };
+
+    curveControlPoints2 = {
+            Vec3(-.75, -.5, 0),
+            Vec3(0, -1.5, -1),
+            Vec3(.75, -.5, 0)
     };
 }
 
 void setupCurvePoints() {
-    curvePoints = BezierCurveByCasteljau(curveControlPoints, nbU);
+    curvePoints1 = BezierCurveByCasteljau(curveControlPoints1, nbU);
+    curvePoints2 = BezierCurveByCasteljau(curveControlPoints2, nbU);
 }
 
 void setupLinePoints() {
@@ -123,10 +130,10 @@ void setupLinePoints() {
     };
 }
 
-#include "surface_cylindrique/surface_cylindrique.h"
+#include "surface_reglee/surface_reglee.h"
 
 void setupIsoCurves() {
-    isoCurves = surfaceCylindrique(curveControlPoints, linePoints, nbU, nbV);
+    isoCurves = surfaceReglee(curveControlPoints1, curveControlPoints2, nbU, nbV);
 }
 
 void setup() {
@@ -186,14 +193,21 @@ void drawCircle(const Vec3 &center, float radius) {
 void drawControlPoints() {
     glColor3f(1, .2, .2);
 
-    for (Vec3 &point: curveControlPoints) {
+    for (Vec3 &point: curveControlPoints1) {
+        drawCircle(point, .01);
+    }
+
+    glColor3f(1, 1, .2);
+
+    for (Vec3 &point: curveControlPoints2) {
         drawCircle(point, .01);
     }
 }
 
-void drawCurve() {
+void drawCurves() {
     glColor3f(1, 1, 1);
-    drawCurveFromPoints(curvePoints);
+    drawCurveFromPoints(curvePoints1);
+    drawCurveFromPoints(curvePoints2);
 }
 
 void drawLine() {
@@ -215,7 +229,7 @@ void draw() {
     glLineWidth(3);
 
     drawControlPoints();
-    drawCurve();
+    drawCurves();
     drawLine();
 
     drawSurface();

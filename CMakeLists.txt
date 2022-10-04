@@ -30,6 +30,7 @@ add_executable(
         src/Vec3.h
 
         surface_cylindrique/surface_cylindrique.cpp surface_cylindrique/surface_cylindrique.h
+        surface_reglee/surface_reglee.cpp surface_reglee/surface_reglee.h
 
         parametric_curves/hermite.cpp parametric_curves/hermite.h
         parametric_curves/berstein.cpp parametric_curves/berstein.h
