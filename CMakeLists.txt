@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 project(Modelisation_TP1)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
@@ -27,6 +28,8 @@ add_executable(
         src/Camera.cpp src/Camera.h
         src/Trackball.cpp   src/Trackball.h
         src/Vec3.h
+
+        surface_cylindrique/surface_cylindrique.cpp surface_cylindrique/surface_cylindrique.h
 
         parametric_curves/hermite.cpp parametric_curves/hermite.h
         parametric_curves/berstein.cpp parametric_curves/berstein.h

@@ -26,7 +26,7 @@ Vec3 BezierPointByCasteljau(const std::vector<Vec3> &controlPoints, const float 
         subControlPoints = nextSubControlPoints;
         nextSubControlPoints.clear();
 
-        for (int i = 0; i < subControlPoints.size() - 1; i++) {
+        for (unsigned int i = 0; i < subControlPoints.size() - 1; i++) {
             Vec3 point;
             Vec3 v = subControlPoints[i + 1] - subControlPoints[i];
             v *= u;

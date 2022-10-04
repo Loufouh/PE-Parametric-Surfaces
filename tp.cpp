@@ -23,6 +23,7 @@
 #include <cstdlib>
 
 #define _USE_MATH_DEFINES
+
 #include <cmath>
 
 #include <algorithm>
@@ -89,48 +90,51 @@ void init() {
 }
 
 
-std::vector<Vec3> controlPoints;
-std::vector<std::vector<Vec3> > constructionPoints;
-std::vector<Vec3> curvePoints;
+#include "parametric_curves/casteljau.h"
 
-void setupControlPoints() {
-    controlPoints = {
-            Vec3(-1, 0, 0),
-            Vec3(-.25, 1, 0),
-            Vec3(0, -1, 0),
-            Vec3(.25, 1, 0),
-            Vec3(1, 0, 0)
+std::vector<Vec3> curveControlPoints;
+std::vector<Vec3> curvePoints;
+std::vector<Vec3> linePoints;
+
+unsigned int nbU = 100;
+unsigned int nbV = 100;
+
+std::vector< std::vector<Vec3> > isoCurves;
+
+
+void setupCurveControlPoints() {
+    curveControlPoints = {
+            Vec3(-.75, .5, 0),
+            Vec3(-.25, 1.5, 1.5),
+            Vec3(0, -.5, -.25),
+            Vec3(.25, 1.5, -1),
+            Vec3(.75, .5, 0)
     };
 }
 
-void setupConstructionPointsFor(float u) {
-    std::vector<Vec3> subControlPoints;
-    std::vector<Vec3> nextSubControlPoints = controlPoints;
-
-    while (nextSubControlPoints.size() > 1) {
-        subControlPoints = nextSubControlPoints;
-        nextSubControlPoints.clear();
-
-        for (int i = 0; i < subControlPoints.size() - 1; i++) {
-            Vec3 point;
-            Vec3 v = subControlPoints[i + 1] - subControlPoints[i];
-            v *= u;
-
-            point = subControlPoints[i] + v;
-
-            nextSubControlPoints.push_back(point);
-        }
-
-        constructionPoints.push_back(nextSubControlPoints);
-    }
+void setupCurvePoints() {
+    curvePoints = BezierCurveByCasteljau(curveControlPoints, nbU);
 }
 
-#include "parametric_curves/hermite.h"
-#include "parametric_curves/berstein.h"
-#include "parametric_curves/casteljau.h"
+void setupLinePoints() {
+    linePoints = {
+            Vec3(0, 100, 0),
+            Vec3(0, -100, 0)
+    };
+}
 
-void setupCurvePoints() {
-    curvePoints = BezierCurveByCasteljau(controlPoints, 100);
+#include "surface_cylindrique/surface_cylindrique.h"
+
+void setupIsoCurves() {
+    isoCurves = surfaceCylindrique(curveControlPoints, linePoints, nbU, nbV);
+}
+
+void setup() {
+    setupCurveControlPoints();
+    setupCurvePoints();
+    setupLinePoints();
+
+    setupIsoCurves();
 }
 
 void update() {
@@ -141,14 +145,22 @@ void update() {
 // Rendering.
 // ------------------------------------
 
-void drawCurve(const std::vector<Vec3> &points) {
-    glBegin(GL_LINE_STRIP);
+void drawCurveFromPoints(const std::vector<Vec3> &points) {
+    glBegin(GL_LINES);
 
-    for (const Vec3 &point: points) {
+    for (int i = 0; i < points.size() - 1; i++) {
+        Vec3 p1 = points[i];
+        Vec3 p2 = points[i + 1];
+
         glVertex3f(
-                point[0],
-                point[1],
-                point[2]
+                p1[0],
+                p1[1],
+                p1[2]
+        );
+        glVertex3f(
+                p2[0],
+                p2[1],
+                p2[2]
         );
     }
 
@@ -158,12 +170,12 @@ void drawCurve(const std::vector<Vec3> &points) {
 void drawCircle(const Vec3 &center, float radius) {
     glBegin(GL_POLYGON);
 
-    for(int i = 0; i < 10; i++) {
-        float angle = 2*M_PI*(float) i / (float)10;
+    for (int i = 0; i < 10; i++) {
+        float angle = 2 * M_PI * (float) i / (float) 10;
 
         glVertex3f(
-                center[0] + radius*cos(angle),
-                center[1] + radius*sin(angle),
+                center[0] + radius * cos(angle),
+                center[1] + radius * sin(angle),
                 center[2]
         );
     }
@@ -171,23 +183,30 @@ void drawCircle(const Vec3 &center, float radius) {
     glEnd();
 }
 
-void drawConstructionLines() {
-    for (int i = 0; i < constructionPoints.size(); i++) {
+void drawControlPoints() {
+    glColor3f(1, .2, .2);
 
-        glColor3f(
-            -.8*(float) (1 + i) / (float) constructionPoints.size() + 1,
-            .8*(float) (1 + i) / (float) constructionPoints.size() + .2,
-            .2
-        );
-
-       drawCurve(constructionPoints[i]);
+    for (Vec3 &point: curveControlPoints) {
+        drawCircle(point, .01);
     }
 }
 
-void drawControlPoints() {
-    glColor3f(1.0, .2, .2);
-    for(Vec3 &point : controlPoints) {
-        drawCircle(point, .025);
+void drawCurve() {
+    glColor3f(1, 1, 1);
+    drawCurveFromPoints(curvePoints);
+}
+
+void drawLine() {
+    glColor3f(0.2, 1, 0.2);
+    drawCurveFromPoints(linePoints);
+}
+
+void drawSurface() {
+    glLineWidth(1);
+    glColor3f(0, 0, 0);
+
+    for(std::vector<Vec3> &curve : isoCurves) {
+        drawCurveFromPoints(curve);
     }
 }
 
@@ -195,14 +214,11 @@ void drawControlPoints() {
 void draw() {
     glLineWidth(3);
 
-    drawConstructionLines();
     drawControlPoints();
+    drawCurve();
+    drawLine();
 
-    glColor3f(1.0, .2, .2);
-    drawCurve(controlPoints);
-
-    glColor3f(1.0, 1.0, 1.0);
-    drawCurve(curvePoints);
+    drawSurface();
 }
 
 void display() {
@@ -313,9 +329,7 @@ int main(int argc, char **argv) {
     glutMouseFunc(mouse);
     key('?', 0, 0);
 
-    setupControlPoints();
-    setupConstructionPointsFor(.90);
-    setupCurvePoints();
+    setup();
 
     glutMainLoop();
     return EXIT_SUCCESS;
