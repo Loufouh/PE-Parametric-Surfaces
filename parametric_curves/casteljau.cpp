@@ -7,8 +7,8 @@
 std::vector<Vec3> BezierCurveByCasteljau(const std::vector<Vec3> &controlPoints, const long nbU) {
     std::vector<Vec3> curvePoints;
 
-    for (int i = 0; i <= nbU; i++) {
-        float u = (float) i / (float) nbU;
+    for (int i = 0; i < nbU; i++) {
+        float u = (float) i / (float) (nbU - 1);
 
         curvePoints.push_back(
                 BezierPointByCasteljau(controlPoints, u)

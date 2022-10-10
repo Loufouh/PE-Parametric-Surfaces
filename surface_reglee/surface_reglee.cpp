@@ -13,16 +13,16 @@ std::vector< std::vector<Vec3> > surfaceReglee(
         unsigned int nbV
 ) {
     std::vector< std::vector<Vec3> > surfacePoints;
-    surfacePoints.reserve(nbU + 1);
+    surfacePoints.reserve(nbU);
 
-    for(unsigned int x = 0; x <= nbU; x++) {
-        float u = (float) x / (float) nbU;
+    for(unsigned int x = 0; x < nbU; x++) {
+        float u = (float) x / (float) (nbU - 1);
 
         surfacePoints.push_back({});
-        surfacePoints.back().reserve(nbV + 1);
+        surfacePoints.back().reserve(nbV);
 
-        for(unsigned int y = 0; y <= nbV; y++) {
-            float v = (float) y / (float) nbV;
+        for(unsigned int y = 0; y < nbV; y++) {
+            float v = (float) y / (float) (nbV - 1);
 
             Vec3 p1 = BezierPointByCasteljau(bezierControlPoints1, u);
             Vec3 p2 = BezierPointByCasteljau(bezierControlPoints2, u);
@@ -34,26 +34,26 @@ std::vector< std::vector<Vec3> > surfaceReglee(
     }
 
     std::vector< std::vector<Vec3> > isoCurves;
-    isoCurves.reserve((nbU + 1) + (nbV + 1));
+    isoCurves.reserve(nbU + nbV);
 
     std::vector<Vec3> curve;
 
-    for(unsigned int x = 0; x <= nbU; x++) {
+    for(unsigned int x = 0; x < nbU; x++) {
         curve.clear();
         curve.reserve(nbV);
 
-        for(unsigned int y = 0; y <= nbV; y++) {
+        for(unsigned int y = 0; y < nbV; y++) {
             curve.push_back(surfacePoints[x][y]);
         }
 
         isoCurves.push_back(curve);
     }
 
-    for(unsigned int y = 0; y <= nbV; y++) {
+    for(unsigned int y = 0; y < nbV; y++) {
         curve.clear();
         curve.reserve(nbU);
 
-        for(unsigned int x = 0; x <= nbU; x++) {
+        for(unsigned int x = 0; x < nbU; x++) {
             curve.push_back(surfacePoints[x][y]);
         }
 

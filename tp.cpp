@@ -98,8 +98,8 @@ std::vector<Vec3> curvePoints1;
 std::vector<Vec3> curvePoints2;
 std::vector<Vec3> linePoints;
 
-unsigned int nbU = 100;
-unsigned int nbV = 100;
+unsigned int nbU = 50;
+unsigned int nbV = 20;
 
 std::vector< std::vector<Vec3> > isoCurves;
 
