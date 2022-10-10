@@ -18,13 +18,13 @@ std::vector< std::vector<Vec3> > surfaceCylindrique(
     surfacePoints.reserve(nbU);
 
     for(unsigned int x = 0; x < nbU; x++) {
-        float u = (float) x / (float) nbU;
+        float u = (float) x / (float) (nbU - 1);
 
         surfacePoints.push_back({});
         surfacePoints.back().reserve(nbV);
 
         for(unsigned int y = 0; y < nbV; y++) {
-            float v = (float) y / (float) nbV;
+            float v = (float) y / (float) (nbV - 1);
 
             Vec3 translationVec = v*lineVec;
             Vec3 bezierPoint = BezierPointByCasteljau(bezierControlPoints, u);
