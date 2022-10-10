@@ -71,7 +71,5 @@ Vec3 BezierSurfacePointByBernstein(
         }
     }
 
-    std::cout << "Point : (" << point[0] << "," << point[1] << "," << point[2] << ")" << std::endl;
-
     return point;
 }
