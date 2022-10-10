@@ -92,54 +92,53 @@ void init() {
 
 #include "parametric_curves/casteljau.h"
 
-std::vector<Vec3> curveControlPoints1;
-std::vector<Vec3> curveControlPoints2;
-std::vector<Vec3> curvePoints1;
-std::vector<Vec3> curvePoints2;
+std::vector< std::vector<Vec3> > gridControlPoints;
 std::vector<Vec3> linePoints;
 
+unsigned int nbControlPointsU = 10;
+unsigned int nbControlPointsV = 10;
+
 unsigned int nbU = 50;
-unsigned int nbV = 20;
+unsigned int nbV = 50;
 
 std::vector< std::vector<Vec3> > isoCurves;
 
+void setupGridControlPoints() {
+    gridControlPoints.clear();
 
-void setupCurveControlPoints() {
-    curveControlPoints1 = {
-            Vec3(-.75, .5, 0),
-            Vec3(0, -.5, 1),
-            Vec3(.75, .5, 0)
-    };
+    for(int i = 0; i < nbControlPointsU; i++) {
+        gridControlPoints.push_back({});
 
-    curveControlPoints2 = {
-            Vec3(-.75, -.5, 0),
-            Vec3(0, -1.5, -1),
-            Vec3(.75, -.5, 0)
-    };
+        float x = 2.0 * (float) i / (float) nbControlPointsU - 1;
+
+        for(int j = 0; j < nbControlPointsV; j++) {
+            float y = 2.0 * (float) j / (float) nbControlPointsV - 1;
+
+            gridControlPoints.back().push_back(
+                   Vec3(
+                           x,
+                           y,
+                           x*x + y*y
+                   )
+            );
+        }
+    }
+
 }
-
-void setupCurvePoints() {
-    curvePoints1 = BezierCurveByCasteljau(curveControlPoints1, nbU);
-    curvePoints2 = BezierCurveByCasteljau(curveControlPoints2, nbU);
-}
-
-void setupLinePoints() {
-    linePoints = {
-            Vec3(0, 100, 0),
-            Vec3(0, -100, 0)
-    };
-}
-
-#include "surface_reglee/surface_reglee.h"
+#include "surface_bernstein/surface_bernstein.h"
 
 void setupIsoCurves() {
-    isoCurves = surfaceReglee(curveControlPoints1, curveControlPoints2, nbU, nbV);
+    isoCurves = BezierSurfaceByBernstein(
+            gridControlPoints,
+            gridControlPoints.size(),
+            gridControlPoints.front().size(),
+            nbU,
+            nbV
+    );
 }
 
 void setup() {
-    setupCurveControlPoints();
-    setupCurvePoints();
-    setupLinePoints();
+    setupGridControlPoints();
 
     setupIsoCurves();
 }
@@ -193,26 +192,11 @@ void drawCircle(const Vec3 &center, float radius) {
 void drawControlPoints() {
     glColor3f(1, .2, .2);
 
-    for (Vec3 &point: curveControlPoints1) {
-        drawCircle(point, .01);
+    for (std::vector<Vec3> &row: gridControlPoints) {
+        for(Vec3 &point : row) {
+            drawCircle(point, .01);
+        }
     }
-
-    glColor3f(1, 1, .2);
-
-    for (Vec3 &point: curveControlPoints2) {
-        drawCircle(point, .01);
-    }
-}
-
-void drawCurves() {
-    glColor3f(1, 1, 1);
-    drawCurveFromPoints(curvePoints1);
-    drawCurveFromPoints(curvePoints2);
-}
-
-void drawLine() {
-    glColor3f(0.2, 1, 0.2);
-    drawCurveFromPoints(linePoints);
 }
 
 void drawSurface() {
@@ -229,8 +213,6 @@ void draw() {
     glLineWidth(3);
 
     drawControlPoints();
-    drawCurves();
-    drawLine();
 
     drawSurface();
 }

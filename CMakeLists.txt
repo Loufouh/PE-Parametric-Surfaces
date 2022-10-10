@@ -31,6 +31,7 @@ add_executable(
 
         surface_cylindrique/surface_cylindrique.cpp surface_cylindrique/surface_cylindrique.h
         surface_reglee/surface_reglee.cpp surface_reglee/surface_reglee.h
+        surface_bernstein/surface_bernstein.cpp surface_bernstein/surface_bernstein.h
 
         parametric_curves/hermite.cpp parametric_curves/hermite.h
         parametric_curves/berstein.cpp parametric_curves/berstein.h
