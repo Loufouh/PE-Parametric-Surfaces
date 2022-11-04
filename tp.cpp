@@ -314,7 +314,7 @@ int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
-    window = glutCreateWindow("TP | Courbes paramétriques");
+    window = glutCreateWindow("TP | Surfaces paramétriques");
 
     init();
     glutIdleFunc(idle);
